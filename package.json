@@ -1,0 +1,43 @@
+{
+  "name": "postiz-mcp",
+  "version": "1.0.0",
+  "description": "Model Context Protocol server for Postiz social media scheduling API",
+  "main": "build/index.js",
+  "type": "module",
+  "bin": {
+    "postiz-mcp": "./build/index.js"
+  },
+  "scripts": {
+    "build": "npm run build-tsc && npm run permissions",
+    "build-tsc": "npx tsc",
+    "permissions": "chmod +x build/index.js",
+    "dev": "npx tsc --watch",
+    "start": "node build/index.js",
+    "format": "prettier --write src/**/*.ts"
+  },
+  "keywords": [
+    "postiz",
+    "social-media",
+    "scheduling",
+    "mcp",
+    "model-context-protocol",
+    "claude",
+    "ai"
+  ],
+  "author": "MCP Developer",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "axios": "^1.6.0",
+    "form-data": "^4.0.0",
+    "zod": "^3.22.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "prettier": "^3.0.0",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
