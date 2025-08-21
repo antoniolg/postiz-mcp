@@ -50,7 +50,7 @@ export function registerCreatePost(server: McpServer, apiClient: PostizApiClient
                 // Transform to the correct Postiz API format
                 const postData = {
                     type: status === 'scheduled' ? 'schedule' as const : 'now' as const,
-                    ...(scheduledDate && status === 'scheduled' && { date: scheduledDate }),
+                    date: status === 'scheduled' ? scheduledDate : new Date().toISOString(),
                     shortLink: false,
                     tags: [],
                     posts: integrations.map(integrationId => ({
@@ -66,7 +66,9 @@ export function registerCreatePost(server: McpServer, apiClient: PostizApiClient
                                 })) : []
                         })),
                         group: Date.now().toString(),
-                        settings: {}
+                        settings: {
+                            post_type: "post"
+                        }
                     }))
                 };
                 

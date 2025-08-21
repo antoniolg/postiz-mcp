@@ -36,7 +36,7 @@ export function registerCreatePost(server, apiClient) {
             // Transform to the correct Postiz API format
             const postData = {
                 type: status === 'scheduled' ? 'schedule' : 'now',
-                ...(scheduledDate && status === 'scheduled' && { date: scheduledDate }),
+                date: status === 'scheduled' ? scheduledDate : new Date().toISOString(),
                 shortLink: false,
                 tags: [],
                 posts: integrations.map(integrationId => ({
@@ -52,7 +52,9 @@ export function registerCreatePost(server, apiClient) {
                             })) : []
                     })),
                     group: Date.now().toString(),
-                    settings: {}
+                    settings: {
+                        post_type: "post"
+                    }
                 }))
             };
             const result = await apiClient.createPost(postData);
