@@ -1,6 +1,5 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import FormData from 'form-data';
-import { log, logRequest, logResponse } from './logger.js';
 
 export interface PostizChannel {
     id: string;
@@ -80,8 +79,6 @@ export class PostizApiClient {
     private client: AxiosInstance;
 
     constructor(private apiKey: string, private baseUrl: string) {
-        log('INFO', 'Initializing PostizApiClient', { baseUrl, apiKeyPreview: apiKey.substring(0, 8) + '...' });
-        
         this.client = axios.create({
             baseURL: baseUrl,
             headers: {
@@ -91,41 +88,18 @@ export class PostizApiClient {
             timeout: 30000,
         });
 
-        // Add request interceptor for debugging
-        this.client.interceptors.request.use((config) => {
-            logRequest(
-                config.method?.toUpperCase() || 'UNKNOWN',
-                `${config.baseURL}${config.url}`,
-                config.headers,
-                config.data
-            );
-            return config;
-        });
-
         // Add response interceptor for error handling
         this.client.interceptors.response.use(
             (response) => {
                 const isHtml = typeof response.data === 'string' && response.data.includes('<!DOCTYPE html>');
                 
-                logResponse(
-                    response.status,
-                    response.headers,
-                    response.data,
-                    isHtml
-                );
-                
                 if (isHtml) {
-                    log('ERROR', 'Received HTML instead of JSON - Authentication likely failed');
+                    throw new Error('Received HTML instead of JSON - Authentication likely failed');
                 }
                 
                 return response;
             },
             (error) => {
-                log('ERROR', 'API Request failed', {
-                    status: error.response?.status,
-                    statusText: error.response?.statusText,
-                    data: error.response?.data || error.message
-                });
                 throw error;
             }
         );
