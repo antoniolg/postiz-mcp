@@ -9,7 +9,7 @@ export function registerUpdatePost(server: McpServer, apiClient: PostizApiClient
         {
             id: z.string().describe('The ID of the post to update'),
             content: z.string().optional().describe('New text content for the post'),
-            integrations: z.array(z.string()).optional().describe('New array of channel/integration IDs'),
+            integrations: z.array(z.string()).describe('Array of channel/integration IDs (required for updates)'),
             status: z.enum(['draft', 'scheduled', 'now']).optional().describe('New post status'),
             scheduledDate: z.string().optional().describe('New ISO 8601 date string for scheduling'),
             images: z.array(z.string()).optional().describe('New array of image URLs or file IDs')
@@ -32,12 +32,10 @@ export function registerUpdatePost(server: McpServer, apiClient: PostizApiClient
                     updateData.content = content;
                 }
                 
-                if (integrations !== undefined) {
-                    if (!integrations || integrations.length === 0) {
-                        throw new Error('At least one integration/channel ID is required');
-                    }
-                    updateData.integrations = integrations;
+                if (!integrations || integrations.length === 0) {
+                    throw new Error('At least one integration/channel ID is required');
                 }
+                updateData.integrations = integrations;
                 
                 if (status !== undefined) {
                     updateData.status = status;

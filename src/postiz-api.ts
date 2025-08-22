@@ -51,6 +51,26 @@ export interface UpdatePostRequest {
     status?: 'draft' | 'scheduled' | 'now';
 }
 
+export interface UpdatePostApiRequest {
+    type: 'schedule' | 'now' | 'draft';
+    date?: string;
+    posts: Array<{
+        integration: {
+            id: string;
+        };
+        value: Array<{
+            content: string;
+            id: string;
+            image?: Array<{
+                id: string;
+                path: string;
+            }>;
+        }>;
+        group: string;
+        settings: Record<string, any>;
+    }>;
+}
+
 export interface ListPostsQuery {
     startDate: string;
     endDate: string;
@@ -131,14 +151,64 @@ export class PostizApiClient {
         return response.data;
     }
 
-    async createPost(postData: CreatePostRequest): Promise<PostizPost> {
+    private async submitPost(postData: CreatePostRequest, postId?: string): Promise<PostizPost> {
+        // If postId is provided, add it to each value in the posts array
+        if (postId) {
+            postData.posts.forEach(post => {
+                post.value.forEach(value => {
+                    (value as any).id = postId;
+                });
+            });
+        }
+        
         const response: AxiosResponse<PostizPost> = await this.client.post('/posts', postData);
         return response.data;
     }
 
+    async createPost(postData: CreatePostRequest): Promise<PostizPost> {
+        return this.submitPost(postData);
+    }
+
     async updatePost(id: string, postData: UpdatePostRequest): Promise<PostizPost> {
-        const response: AxiosResponse<PostizPost> = await this.client.put(`/posts/${id}`, postData);
-        return response.data;
+        if (!postData.integrations || postData.integrations.length === 0) {
+            throw new Error('At least one integration/channel ID is required for update');
+        }
+
+        // Convert UpdatePostRequest to CreatePostRequest format
+        const createPostFormat: CreatePostRequest = {
+            type: postData.status === 'scheduled' ? 'schedule' : 
+                  postData.status === 'now' ? 'now' : 'schedule',
+            shortLink: false,
+            tags: [],
+            posts: postData.integrations.map(integrationId => ({
+                integration: {
+                    id: integrationId
+                },
+                value: [{
+                    content: postData.content || '',
+                    image: postData.images && postData.images.length > 0 
+                        ? postData.images.map(img => ({
+                            id: img.includes('/') ? '' : img,
+                            path: img
+                        }))
+                        : []
+                }],
+                group: 'post',
+                settings: {
+                    ...(integrationId.includes('instagram') ? { post_type: 'post' } : {})
+                }
+            }))
+        };
+
+        // Set the date if provided
+        if (postData.scheduledDate) {
+            createPostFormat.date = postData.scheduledDate;
+        } else if (postData.status === 'now') {
+            createPostFormat.date = new Date().toISOString();
+        }
+
+        // Use the common method with the post ID
+        return this.submitPost(createPostFormat, id);
     }
 
     async deletePost(id: string): Promise<void> {
