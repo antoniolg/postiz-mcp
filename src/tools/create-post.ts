@@ -10,7 +10,7 @@ export function registerCreatePost(server: McpServer, apiClient: PostizApiClient
             content: z.array(z.string()).describe('Array of text content for posts (one item = single post, multiple items = thread/multiple posts). IMPORTANT: If user wants to add comments to posts, each comment is a separate post in this array.'),
             integrations: z.array(z.string()).describe('Array of channel/integration IDs to post to'),
             status: z.enum(['draft', 'scheduled', 'now']).optional().describe('Post status: draft (save as draft), scheduled (schedule for later), or now (publish immediately)'),
-            scheduledDate: z.string().optional().describe('ISO 8601 date string for when to schedule the post (required if status is "scheduled"). IMPORTANT: Use local timezone format like "2024-01-15T15:00:00" - the system will handle timezone conversion. Do NOT use UTC format.'),
+            scheduledDate: z.string().optional().describe('ISO 8601 date string for scheduling. IMPORTANT: Always include timezone offset (e.g., "2024-01-15T17:15:00+01:00" for CET or "2024-01-15T17:15:00+02:00" for CEST). Without timezone specification, the system defaults to UTC which may cause incorrect scheduling. Use IANA timezone names in documentation but ISO format with offset in actual parameter.'),
             images: z.array(z.string()).optional().describe('Array of image PUBLIC URLs (not IDs) to include with the first post. IMPORTANT: When uploading images via postiz-upload-file, use the returned public URL, not the file ID.')
         },
         async (args) => {
@@ -39,7 +39,7 @@ export function registerCreatePost(server: McpServer, apiClient: PostizApiClient
                     // Check if date is valid and in the future
                     const scheduleDateTime = new Date(scheduledDate);
                     if (isNaN(scheduleDateTime.getTime())) {
-                        throw new Error('Invalid scheduledDate format. Use ISO 8601 format (e.g., "2024-01-15T10:00:00Z")');
+                        throw new Error('Invalid scheduledDate format. Use ISO 8601 format with timezone offset (e.g., "2024-01-15T17:15:00+01:00")');
                     }
                     
                     if (scheduleDateTime <= new Date()) {

@@ -195,7 +195,7 @@ export class PostizApiClient {
                 }],
                 group: 'post',
                 settings: {
-                    ...(integrationId.includes('instagram') ? { post_type: 'post' } : {})
+                    post_type: "post"
                 }
             }))
         };

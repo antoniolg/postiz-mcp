@@ -11,7 +11,7 @@ export function registerUpdatePost(server: McpServer, apiClient: PostizApiClient
             content: z.string().optional().describe('New text content for the post'),
             integrations: z.array(z.string()).describe('Array of channel/integration IDs (required for updates)'),
             status: z.enum(['draft', 'scheduled', 'now']).optional().describe('New post status'),
-            scheduledDate: z.string().optional().describe('New ISO 8601 date string for scheduling'),
+            scheduledDate: z.string().optional().describe('ISO 8601 date string for scheduling. IMPORTANT: Always include timezone offset (e.g., "2024-01-15T17:15:00+01:00" for CET or "2024-01-15T17:15:00+02:00" for CEST). Without timezone specification, the system defaults to UTC which may cause incorrect scheduling. Use IANA timezone names in documentation but ISO format with offset in actual parameter.'),
             images: z.array(z.string()).optional().describe('New array of image URLs or file IDs')
         },
         async (args) => {
@@ -48,7 +48,7 @@ export function registerUpdatePost(server: McpServer, apiClient: PostizApiClient
                         
                         const scheduleDateTime = new Date(scheduledDate);
                         if (isNaN(scheduleDateTime.getTime())) {
-                            throw new Error('Invalid scheduledDate format. Use ISO 8601 format');
+                            throw new Error('Invalid scheduledDate format. Use ISO 8601 format with timezone offset (e.g., "2024-01-15T17:15:00+01:00")');
                         }
                         
                         if (scheduleDateTime <= new Date()) {
