@@ -16,7 +16,7 @@
 - [x] Actualizar el adaptador MCP (`src/index.ts`) para registrar herramientas a partir de las nuevas definiciones y verificar que nada se rompe. _(2025-10-13 · `registerPostizTools` centraliza el alta vía `src/adapters/mcp.ts`, `postizTools` lista las definiciones)_
 - [x] Implementar el binario TypeScript `src/cli.ts` que cree el comando `postiz`, configure `commander`, liste todas las herramientas y registre subcomandos con ayuda autogenerada desde el esquema Zod. _(2025-10-13 · CLI basado en Commander con subcomandos autogenerados desde `postizTools`)_
 - [x] Diseñar y codificar el mapeo de tipos Zod a flags CLI (strings, números, booleanos, arrays) con mensajes de ayuda claros y validaciones consistentes. _(2025-10-13 · `configureToolCommand` interpreta `ZodString`, `ZodEnum`, `ZodArray` y valores opcionales)_
-- [ ] Configurar scripts de compilación y distribución (`package.json`) para que `postiz` se genere en `build/`, añadir `npm run dev:cli` con `tsx --watch` y documentar el uso de `npm link` para probar el comando sin reiniciar la terminal.
+- [x] Configurar scripts de compilación y distribución (`package.json`) para que `postiz` se genere en `build/`, añadir `npm run dev:cli` con `tsx --watch` y documentar el uso de `npm link` para probar el comando sin reiniciar la terminal. _(2025-10-13 · Scripts actualizados, bin `postiz` apunta a `build/cli.js`, `dev:cli` listo para hot reload)_
 - [ ] Actualizar documentación (README y ejemplos) describiendo uso de `postiz --help`, formato de argumentos de cada herramienta y pasos para desarrollo en caliente.
 - [ ] Ejecutar y documentar pruebas manuales del CLI frente a la API (incluidas rutas felices y casos de error de validación) y reflejar los resultados en el plan.
 

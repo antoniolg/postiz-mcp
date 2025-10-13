@@ -5,15 +5,17 @@
   "main": "build/index.js",
   "type": "module",
   "bin": {
-    "postiz-mcp": "./build/index.js"
+    "postiz-mcp": "./build/index.js",
+    "postiz": "./build/cli.js"
   },
   "scripts": {
     "build": "npm run build-tsc && npm run permissions",
     "build-tsc": "npx tsc",
-    "permissions": "chmod +x build/index.js",
+    "permissions": "chmod +x build/index.js build/cli.js",
     "dev": "npx tsc --watch",
     "start": "node build/index.js",
-    "format": "prettier --write src/**/*.ts"
+    "format": "prettier --write src/**/*.ts",
+    "dev:cli": "tsx watch src/cli.ts --"
   },
   "keywords": [
     "postiz",
@@ -36,6 +38,7 @@
   "devDependencies": {
     "@types/node": "^20.0.0",
     "prettier": "^3.0.0",
+    "tsx": "^4.20.6",
     "typescript": "^5.0.0"
   },
   "engines": {
