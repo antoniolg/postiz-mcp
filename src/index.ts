@@ -3,12 +3,7 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { PostizApiClient } from './postiz-api.js';
-import { registerGetChannels } from './tools/get-channels.js';
-import { registerUploadFile } from './tools/upload-file.js';
-import { registerListPosts } from './tools/list-posts.js';
-import { registerCreatePost } from './tools/create-post.js';
-import { registerUpdatePost } from './tools/update-post.js';
-import { registerDeletePost } from './tools/delete-post.js';
+import { registerPostizTools } from './adapters/mcp.js';
 
 if (!process.env.POSTIZ_API_KEY) {
     console.error('Error: POSTIZ_API_KEY environment variable is required');
@@ -32,12 +27,7 @@ const server = new McpServer(
 );
 
 // Register all tools
-registerGetChannels(server, apiClient);
-registerUploadFile(server, apiClient);
-registerListPosts(server, apiClient);
-registerCreatePost(server, apiClient);
-registerUpdatePost(server, apiClient);
-registerDeletePost(server, apiClient);
+registerPostizTools(server, apiClient);
 
 async function main() {
     const transport = new StdioServerTransport();
