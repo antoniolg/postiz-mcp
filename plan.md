@@ -17,8 +17,9 @@
 - [x] Implementar el binario TypeScript `src/cli.ts` que cree el comando `postiz`, configure `commander`, liste todas las herramientas y registre subcomandos con ayuda autogenerada desde el esquema Zod. _(2025-10-13 · CLI basado en Commander con subcomandos autogenerados desde `postizTools`)_
 - [x] Diseñar y codificar el mapeo de tipos Zod a flags CLI (strings, números, booleanos, arrays) con mensajes de ayuda claros y validaciones consistentes. _(2025-10-13 · `configureToolCommand` interpreta `ZodString`, `ZodEnum`, `ZodArray` y valores opcionales)_
 - [x] Configurar scripts de compilación y distribución (`package.json`) para que `postiz` se genere en `build/`, añadir `npm run dev:cli` con `tsx --watch` y documentar el uso de `npm link` para probar el comando sin reiniciar la terminal. _(2025-10-13 · Scripts actualizados, bin `postiz` apunta a `build/cli.js`, `dev:cli` listo para hot reload)_
-- [ ] Actualizar documentación (README y ejemplos) describiendo uso de `postiz --help`, formato de argumentos de cada herramienta y pasos para desarrollo en caliente.
+- [x] Actualizar documentación (README y ejemplos) describiendo uso de `postiz --help`, formato de argumentos de cada herramienta y pasos para desarrollo en caliente. _(2025-10-13 · README renovado con secciones de CLI, ejemplos de comandos y modo `dev:cli`)_
 - [ ] Ejecutar y documentar pruebas manuales del CLI frente a la API (incluidas rutas felices y casos de error de validación) y reflejar los resultados en el plan.
+- [ ] Definir alias cortos y coherentes para los comandos del CLI (p.ej. `channels`, `create`, `delete`) manteniendo compatibilidad con los nombres MCP.
 
 ## Seguimiento
 

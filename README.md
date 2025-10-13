@@ -1,9 +1,10 @@
-# Postiz MCP Server
+# Postiz MCP Server & CLI
 
-A Model Context Protocol (MCP) server for the [Postiz](https://postiz.com) social media scheduling API. This server allows AI assistants to interact with Postiz to manage social media posts across multiple platforms.
+A Model Context Protocol (MCP) server **and** command-line interface for the [Postiz](https://postiz.com) social media scheduling API. Both entrypoints share the same tool definitions so that AI assistants and human operators can manage social media posts across multiple platforms with identical capabilities.
 
 ## Features
 
+- **Command-line interface**: `postiz` binary with `--help` output designed for humans and LLMs
 - **Get Channels**: List available social media integrations
 - **Upload Files**: Upload images and media for posts
 - **List Posts**: Query posts with date range filtering
@@ -28,11 +29,43 @@ Postiz supports posting to: X (Twitter), LinkedIn, LinkedIn Pages, Reddit, Insta
    npm run build
    ```
 
+## Using the CLI
+
+> The CLI and the MCP server share the same environment variables (`POSTIZ_API_KEY`, `POSTIZ_BASE_URL`). Configure them once and they will work in both contexts.
+
+### Quick test without installation
+
+```bash
+npx tsx src/cli.ts --help
+```
+
+### Install the `postiz` binary
+
+```bash
+npm run build
+npm_config_prefix="$HOME/.npm-global" npm link   # Or just `npm link` if you have system permissions
+```
+
+Make sure `$(npm config get prefix)/bin` (e.g. `~/.npm-global/bin`) is in your `PATH`, then run:
+
+```bash
+postiz --help
+postiz postiz-list-posts --start-date 2024-10-01 --end-date 2024-10-07 --pretty
+```
+
+### Hot reload during development
+
+```bash
+npm run dev:cli -- --help
+```
+
+The watcher re-runs the CLI with the same arguments every time you save a file under `src/`.
+
 ## Configuration
 
 ### Environment Variables
 
-Create a `.env` file with the following variables:
+Set the variables in your shell profile (`~/.zshrc`, `~/.bash_profile`, etc.) or create a `.env` file with the following values:
 
 ```env
 POSTIZ_API_KEY=your_postiz_api_key_here
@@ -73,6 +106,8 @@ Add this to your Claude Desktop configuration file:
 ```
 
 ## Available Tools
+
+All commands exposed by the MCP server are available in the CLI. Run `postiz --help` to see the full list and `postiz <tool-name> --help` to inspect the parameters (help text is generated automatically from the Zod schema).
 
 ### postiz-get-channels
 Get list of available social media channels/integrations.
@@ -131,29 +166,26 @@ Generate AI video (Beta feature).
 - duration: number (optional) - Duration in seconds
 ```
 
-## Example Usage
+## Example Usage (CLI)
 
-### Creating a Post
-```
-Use postiz-create-post with:
-- content: "Hello from my AI assistant! 🤖"
-- integrations: ["twitter_channel_id", "linkedin_channel_id"]
-- status: "now"
-```
+```bash
+# Create an immediate post
+postiz postiz-create-post \
+  --content "Hello from my AI assistant! 🤖" \
+  --integrations twitter_channel_id \
+  --integrations linkedin_channel_id \
+  --status now
 
-### Scheduling a Post
-```
-Use postiz-create-post with:
-- content: "Scheduled post content"
-- integrations: ["twitter_channel_id"]
-- status: "scheduled"
-- scheduledDate: "2024-01-15T10:00:00Z"
-```
+# Schedule a post
+postiz postiz-create-post \
+  --content "Scheduled post content" \
+  --integrations twitter_channel_id \
+  --status scheduled \
+  --scheduled-date "2024-01-15T10:00:00+01:00"
 
-### Uploading and Using Images
-```
-1. Use postiz-upload-file with filePath: "/path/to/image.jpg"
-2. Use the returned file ID in postiz-create-post images array
+# Upload an image and reuse it
+postiz postiz-upload-file --file-path /path/to/image.jpg --pretty
+# Use the returned URL in the --images array when calling postiz-create-post
 ```
 
 ## Development
@@ -165,7 +197,11 @@ npm run build
 
 ### Development Mode
 ```bash
-npm run dev  # Builds with watch mode
+# Rebuilds and restarts the MCP server in watch mode
+npm run dev
+
+# Iterate on the CLI without rebuilding the output in build/
+npm run dev:cli -- --help
 ```
 
 ### Format Code
