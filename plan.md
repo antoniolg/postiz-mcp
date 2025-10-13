@@ -18,7 +18,7 @@
 - [x] Diseñar y codificar el mapeo de tipos Zod a flags CLI (strings, números, booleanos, arrays) con mensajes de ayuda claros y validaciones consistentes. _(2025-10-13 · `configureToolCommand` interpreta `ZodString`, `ZodEnum`, `ZodArray` y valores opcionales)_
 - [x] Configurar scripts de compilación y distribución (`package.json`) para que `postiz` se genere en `build/`, añadir `npm run dev:cli` con `tsx --watch` y documentar el uso de `npm link` para probar el comando sin reiniciar la terminal. _(2025-10-13 · Scripts actualizados, bin `postiz` apunta a `build/cli.js`, `dev:cli` listo para hot reload)_
 - [x] Actualizar documentación (README y ejemplos) describiendo uso de `postiz --help`, formato de argumentos de cada herramienta y pasos para desarrollo en caliente. _(2025-10-13 · README renovado con secciones de CLI, ejemplos de comandos y modo `dev:cli`)_
-- [ ] Ejecutar y documentar pruebas manuales del CLI frente a la API (incluidas rutas felices y casos de error de validación) y reflejar los resultados en el plan.
+- [x] Ejecutar y documentar pruebas manuales del CLI frente a la API (incluidas rutas felices y casos de error de validación) y reflejar los resultados en el plan. _(2025-10-13 · `postiz --help`, `postiz postiz-get-channels`, `postiz postiz-list-posts`, creación/eliminación programada, verificación error por API key ausente)_
 - [ ] Definir alias cortos y coherentes para los comandos del CLI (p.ej. `channels`, `create`, `delete`) manteniendo compatibilidad con los nombres MCP.
 
 ## Seguimiento
