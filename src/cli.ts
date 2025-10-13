@@ -1,11 +1,21 @@
 #!/usr/bin/env node
 
-import { Command } from 'commander';
+import { Command, Option } from 'commander';
 import { z, ZodTypeAny } from 'zod';
 import { PostizApiClient } from './postiz-api.js';
-import { postizTools } from './tools/definitions.js';
+import type { AnyPostizToolDefinition } from './tools/definitions.js';
+import { getChannelsTool } from './tools/get-channels.js';
+import { uploadFileTool } from './tools/upload-file.js';
+import { listPostsTool } from './tools/list-posts.js';
+import { createPostTool } from './tools/create-post.js';
+import { updatePostTool } from './tools/update-post.js';
+import { deletePostTool } from './tools/delete-post.js';
 
 const DEFAULT_BASE_URL = 'https://api.postiz.com/public/v1';
+const ENVIRONMENT_HELP_TEXT = `Environment variables:
+  POSTIZ_API_KEY    Postiz API key (alternative to --api-key)
+  POSTIZ_BASE_URL   Override the API base URL
+  POSTIZ_CLI_DEBUG  Include stack traces on errors`;
 
 interface GlobalOptions {
     apiKey?: string;
@@ -51,19 +61,27 @@ function buildApiClient(options: GlobalOptions) {
     return new PostizApiClient(apiKey, baseUrl);
 }
 
-function configureToolCommand(root: Command, tool: (typeof postizTools)[number]) {
-    const commandName = tool.cli?.command ?? tool.name;
-    const command = root
-        .command(commandName)
-        .description(tool.cli?.summary ?? tool.description);
+interface CommandOverrides {
+    name?: string;
+    description?: string;
+    aliases?: string[];
+}
+
+function configureToolCommand(parent: Command, tool: AnyPostizToolDefinition, overrides: CommandOverrides = {}) {
+    const commandName = overrides.name ?? tool.cli?.command ?? tool.name;
+    const commandDescription = overrides.description ?? tool.cli?.summary ?? tool.description;
+    const command = parent.command(commandName).description(commandDescription);
 
     const aliasCandidates = [
+        ...(overrides.aliases ?? []),
         ...(tool.cli?.aliases ?? []),
         ...(commandName !== tool.name ? [tool.name] : []),
     ];
 
-    if (aliasCandidates.length > 0) {
-        command.aliases([...new Set(aliasCandidates)]);
+    const uniqueAliases = [...new Set(aliasCandidates)].filter((alias) => alias !== commandName);
+
+    if (uniqueAliases.length > 0) {
+        command.aliases(uniqueAliases);
     }
     const schemaObject = z.object(tool.schema);
     const schemaEntries = Object.entries(tool.schema) as Array<[string, ZodTypeAny]>;
@@ -78,42 +96,45 @@ function configureToolCommand(root: Command, tool: (typeof postizTools)[number])
         }
 
         const flag = `--${toKebabCase(String(key))}`;
-        const description = schema.description || fieldSchema.description || '';
+        let description = schema.description || fieldSchema.description || '';
+
+        if (schema instanceof z.ZodEnum && !description) {
+            description = 'Select one of the available choices';
+        }
+
+        const option = new Option(`${flag} <value>`, description);
+
+        if (!optional) {
+            option.makeOptionMandatory();
+        }
 
         if (schema instanceof z.ZodArray && schema.element instanceof z.ZodString) {
             // Repeated flag collects array values.
-            command.option(
-                `${flag} <value>`,
-                description,
-                (input: string, previous: string[] | undefined) => {
-                    const values = previous ? [...previous] : [];
-                    values.push(input);
-                    return values;
-                },
-                optional ? undefined : []
-            );
+            option.argParser((input: string, previous: string[] | undefined) => {
+                const values = previous ? [...previous] : [];
+                values.push(input);
+                return values;
+            });
+            command.addOption(option);
             return;
         }
 
         if (schema instanceof z.ZodEnum) {
-            const choices = schema.options.join(', ');
-            command.option(
-                `${flag} <value>`,
-                description ? `${description} (choices: ${choices})` : `choices: ${choices}`
-            );
+            option.choices([...schema.options]);
+            command.addOption(option);
             return;
         }
 
         if (schema instanceof z.ZodString) {
-            command.option(`${flag} <value>`, description);
+            command.addOption(option);
             return;
         }
 
         throw new Error(`Unsupported schema type for field ${String(key)}`);
     });
 
-    command.action(async (commandOptions) => {
-        const globalOptions = root.optsWithGlobals() as GlobalOptions;
+    command.action(async (commandOptions, cmd) => {
+        const globalOptions = cmd.optsWithGlobals() as GlobalOptions;
         const pretty = Boolean(globalOptions.pretty);
 
         try {
@@ -214,13 +235,41 @@ async function main(argv: string[]) {
         .option('--base-url <url>', 'Base URL for the Postiz API (POSTIZ_BASE_URL)')
         .option('--pretty', 'Pretty-print JSON output');
 
-    postizTools.forEach((tool) => {
-        configureToolCommand(program, tool);
+    program.showHelpAfterError();
+
+    const postsCommand = program
+        .command('posts')
+        .description('Manage posts in Postiz')
+        .alias('post');
+
+    configureToolCommand(postsCommand, listPostsTool, {
+        name: 'list',
+    });
+
+    configureToolCommand(postsCommand, createPostTool, {
+        name: 'create',
+    });
+
+    configureToolCommand(postsCommand, updatePostTool, {
+        name: 'update',
+    });
+
+    configureToolCommand(postsCommand, deletePostTool, {
+        name: 'delete',
+    });
+
+    configureToolCommand(program, getChannelsTool, {
+        name: 'channels',
+    });
+
+    configureToolCommand(program, uploadFileTool, {
+        name: 'upload',
+        description: 'Upload a file to Postiz for use in posts (images, videos, etc.)',
     });
 
     program.addHelpText(
         'afterAll',
-        `\nEnvironment variables:\n  POSTIZ_API_KEY    Postiz API key (alternative to --api-key)\n  POSTIZ_BASE_URL   Override the API base URL\n  POSTIZ_CLI_DEBUG  Include stack traces on errors\n`
+        `\n${ENVIRONMENT_HELP_TEXT}\n`
     );
 
     await program.parseAsync(argv);
