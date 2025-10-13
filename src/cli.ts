@@ -52,7 +52,19 @@ function buildApiClient(options: GlobalOptions) {
 }
 
 function configureToolCommand(root: Command, tool: (typeof postizTools)[number]) {
-    const command = root.command(tool.name).description(tool.description);
+    const commandName = tool.cli?.command ?? tool.name;
+    const command = root
+        .command(commandName)
+        .description(tool.cli?.summary ?? tool.description);
+
+    const aliasCandidates = [
+        ...(tool.cli?.aliases ?? []),
+        ...(commandName !== tool.name ? [tool.name] : []),
+    ];
+
+    if (aliasCandidates.length > 0) {
+        command.aliases([...new Set(aliasCandidates)]);
+    }
     const schemaObject = z.object(tool.schema);
     const schemaEntries = Object.entries(tool.schema) as Array<[string, ZodTypeAny]>;
 

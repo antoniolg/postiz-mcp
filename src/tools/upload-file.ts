@@ -13,6 +13,10 @@ export const uploadFileTool: PostizToolDefinition<typeof schema> = {
     name: 'postiz-upload-file',
     description: 'Upload a file to Postiz for use in posts (images, videos, etc.)',
     schema,
+    cli: {
+        command: 'upload',
+        aliases: ['upload-file']
+    },
     execute: async ({ filePath, filename }, { apiClient }) => {
         try {
             if (!fs.existsSync(filePath)) {

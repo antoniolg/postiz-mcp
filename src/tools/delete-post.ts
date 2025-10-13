@@ -11,6 +11,10 @@ export const deletePostTool: PostizToolDefinition<typeof schema> = {
     name: 'postiz-delete-post',
     description: 'Delete a post from Postiz',
     schema,
+    cli: {
+        command: 'delete',
+        aliases: ['delete-post']
+    },
     execute: async ({ id }, { apiClient }) => {
         try {
             if (!id.trim()) {

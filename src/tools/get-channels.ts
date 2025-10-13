@@ -9,6 +9,10 @@ export const getChannelsTool: PostizToolDefinition<typeof schema> = {
     name: 'postiz-get-channels',
     description: 'Get list of available social media channels/integrations in Postiz',
     schema,
+    cli: {
+        command: 'channels',
+        aliases: ['get-channels']
+    },
     execute: async (_args, { apiClient }) => {
         try {
             const channels = await apiClient.getChannels();

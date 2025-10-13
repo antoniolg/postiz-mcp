@@ -13,6 +13,10 @@ export const listPostsTool: PostizToolDefinition<typeof schema> = {
     name: 'postiz-list-posts',
     description: 'List posts from Postiz with date range filtering',
     schema,
+    cli: {
+        command: 'posts',
+        aliases: ['list-posts']
+    },
     execute: async ({ startDate, endDate, customer }, { apiClient }) => {
         try {
             const dateRegex = /^\d{4}-\d{2}-\d{2}$/;

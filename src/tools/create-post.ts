@@ -15,6 +15,10 @@ export const createPostTool: PostizToolDefinition<typeof schema> = {
     name: 'postiz-create-post',
     description: 'Create a new post in Postiz (draft, scheduled, or immediate)',
     schema,
+    cli: {
+        command: 'create',
+        aliases: ['create-post']
+    },
     execute: async (args, { apiClient }) => {
         try {
             const { content, integrations, status = 'draft', scheduledDate, images } = args;

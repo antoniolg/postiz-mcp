@@ -50,7 +50,7 @@ Make sure `$(npm config get prefix)/bin` (e.g. `~/.npm-global/bin`) is in your `
 
 ```bash
 postiz --help
-postiz postiz-list-posts --start-date 2024-10-01 --end-date 2024-10-07 --pretty
+postiz posts --start-date 2024-10-01 --end-date 2024-10-07 --pretty
 ```
 
 ### Hot reload during development
@@ -109,20 +109,20 @@ Add this to your Claude Desktop configuration file:
 
 All commands exposed by the MCP server are available in the CLI. Run `postiz --help` to see the full list and `postiz <tool-name> --help` to inspect the parameters (help text is generated automatically from the Zod schema).
 
-### postiz-get-channels
+### postiz-get-channels (CLI: `postiz channels`)
 Get list of available social media channels/integrations.
 ```
 No parameters required
 ```
 
-### postiz-upload-file
+### postiz-upload-file (CLI: `postiz upload`)
 Upload a file for use in posts.
 ```
 - filePath: string (required) - Path to the file to upload
 - filename: string (optional) - Custom filename
 ```
 
-### postiz-list-posts
+### postiz-list-posts (CLI: `postiz posts`)
 List posts with date range filtering.
 ```
 - startDate: string (required) - Start date in YYYY-MM-DD format
@@ -130,7 +130,7 @@ List posts with date range filtering.
 - customer: string (optional) - Customer filter
 ```
 
-### postiz-create-post
+### postiz-create-post (CLI: `postiz create`)
 Create a new post.
 ```
 - content: string (required) - Post text content
@@ -140,7 +140,7 @@ Create a new post.
 - images: string[] (optional) - Array of image URLs/file IDs
 ```
 
-### postiz-update-post
+### postiz-update-post (CLI: `postiz update`)
 Update an existing post.
 ```
 - id: string (required) - Post ID to update
@@ -151,7 +151,7 @@ Update an existing post.
 - images: string[] (optional) - New images
 ```
 
-### postiz-delete-post
+### postiz-delete-post (CLI: `postiz delete`)
 Delete a post.
 ```
 - id: string (required) - Post ID to delete
@@ -170,22 +170,22 @@ Generate AI video (Beta feature).
 
 ```bash
 # Create an immediate post
-postiz postiz-create-post \
+postiz create \
   --content "Hello from my AI assistant! 🤖" \
   --integrations twitter_channel_id \
   --integrations linkedin_channel_id \
   --status now
 
 # Schedule a post
-postiz postiz-create-post \
+postiz create \
   --content "Scheduled post content" \
   --integrations twitter_channel_id \
   --status scheduled \
   --scheduled-date "2024-01-15T10:00:00+01:00"
 
 # Upload an image and reuse it
-postiz postiz-upload-file --file-path /path/to/image.jpg --pretty
-# Use the returned URL in the --images array when calling postiz-create-post
+postiz upload --file-path /path/to/image.jpg --pretty
+# Use the returned URL in the --images array when calling `postiz create`
 ```
 
 ## Development

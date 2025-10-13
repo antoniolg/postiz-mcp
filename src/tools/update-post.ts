@@ -16,6 +16,10 @@ export const updatePostTool: PostizToolDefinition<typeof schema> = {
     name: 'postiz-update-post',
     description: 'Update an existing post in Postiz',
     schema,
+    cli: {
+        command: 'update',
+        aliases: ['update-post']
+    },
     execute: async ({ id, content, integrations, status, scheduledDate, images }, { apiClient }) => {
         try {
             if (!id.trim()) {
