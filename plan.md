@@ -12,7 +12,7 @@
 ## Tareas
 
 - [x] Documentar con mayor detalle el diseño del CLI (estructura de carpetas, dependencias nuevas como `commander` y `tsx`, estrategia de salida y errores). _(2025-10-13 · Diseño base documentado en la sección "Diseño del CLI")_
-- [ ] Extraer cada herramienta a un objeto de definición reutilizable (`name`, `description`, `schema`, `execute`) que pueda consumir tanto el MCP como el CLI.
+- [x] Extraer cada herramienta a un objeto de definición reutilizable (`name`, `description`, `schema`, `execute`) que pueda consumir tanto el MCP como el CLI. _(2025-10-13 · Cada herramienta exporta `PostizToolDefinition` y mantiene `register...` como adaptadores)_
 - [ ] Actualizar el adaptador MCP (`src/index.ts`) para registrar herramientas a partir de las nuevas definiciones y verificar que nada se rompe.
 - [ ] Implementar el binario TypeScript `src/cli.ts` que cree el comando `postiz`, configure `commander`, liste todas las herramientas y registre subcomandos con ayuda autogenerada desde el esquema Zod.
 - [ ] Diseñar y codificar el mapeo de tipos Zod a flags CLI (strings, números, booleanos, arrays) con mensajes de ayuda claros y validaciones consistentes.
