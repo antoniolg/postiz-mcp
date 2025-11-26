@@ -2,6 +2,7 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { PostizApiClient, UpdatePostRequest } from '../postiz-api.js';
 import { z } from 'zod';
 import { PostizToolDefinition } from './tool-definition.js';
+import { convertMarkdownToHtml } from '../utils/markdown.js';
 
 const schema = {
     id: z.string().describe('The ID of the post to update'),
@@ -38,7 +39,7 @@ export const updatePostTool: PostizToolDefinition<typeof schema> = {
                 if (!content.trim()) {
                     throw new Error('Post content cannot be empty');
                 }
-                updateData.content = content;
+                updateData.content = convertMarkdownToHtml(content);
             }
 
             if (status !== undefined) {
