@@ -6,7 +6,12 @@ import { convertMarkdownToHtml } from '../utils/markdown.js';
 
 const schema = {
     id: z.string().describe('The ID of the post to update'),
-    content: z.string().optional().describe('New text content for the post'),
+    content: z
+        .string()
+        .optional()
+        .describe(
+            'Full text content for the post. IMPORTANT: On update you must send the complete content again (even if unchanged); omitting it will clear the text.'
+        ),
     integrations: z.array(z.string()).describe('Array of channel/integration IDs (required for updates)'),
     status: z.enum(['draft', 'scheduled', 'now']).optional().describe('New post status'),
     scheduledDate: z.string().optional().describe('ISO 8601 date string for scheduling. IMPORTANT: Always include timezone offset (e.g., "2024-01-15T17:15:00+01:00" for CET or "2024-01-15T17:15:00+02:00" for CEST). Without timezone specification, the system defaults to UTC which may cause incorrect scheduling. Use IANA timezone names in documentation but ISO format with offset in actual parameter.'),
@@ -15,7 +20,8 @@ const schema = {
 
 export const updatePostTool: PostizToolDefinition<typeof schema> = {
     name: 'postiz-update-post',
-    description: 'Update an existing post in Postiz',
+    description:
+        'Update an existing post in Postiz. IMPORTANT: updates are not partial; include the full content again or it will be cleared.',
     schema,
     cli: {
         command: 'update',

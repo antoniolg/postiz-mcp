@@ -125,8 +125,8 @@ Upload a file for use in posts.
 ### postiz-list-posts (CLI: `postiz posts`)
 List posts with date range filtering.
 ```
-- startDate: string (required) - Start date in YYYY-MM-DD format
-- endDate: string (required) - End date in YYYY-MM-DD format
+- startDate: string (required) - Start date in YYYY-MM-DD or ISO 8601 datetime (date-only expands to 00:00:00)
+- endDate: string (required) - End date in YYYY-MM-DD or ISO 8601 datetime (date-only expands to 23:59:59.999)
 - customer: string (optional) - Customer filter
 ```
 
@@ -141,10 +141,10 @@ Create a new post.
 ```
 
 ### postiz-update-post (CLI: `postiz update`)
-Update an existing post.
+Update an existing post. IMPORTANT: updates are not partial; include the full content again or it will be cleared.
 ```
 - id: string (required) - Post ID to update
-- content: string (optional) - New content
+- content: string (optional) - Full content (send all text again, even if unchanged)
 - integrations: string[] (optional) - New channel IDs
 - status: 'draft' | 'scheduled' | 'now' (optional) - New status
 - scheduledDate: string (optional) - New schedule date

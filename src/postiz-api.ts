@@ -195,7 +195,8 @@ export class PostizApiClient {
                 }],
                 group: 'post',
                 settings: {
-                    post_type: "post"
+                    post_type: "post",
+                    who_can_reply_post: 'everyone'
                 }
             }))
         };

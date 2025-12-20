@@ -51,6 +51,22 @@ export const createPostTool: PostizToolDefinition<typeof schema> = {
                 }
             }
 
+            // Build YouTube integration set dynamically (no hardcoded IDs)
+            const YOUTUBE_IDS = new Set<string>();
+            try {
+                const channels = await apiClient.getChannels();
+                channels
+                    .filter((c) => (c as any).identifier === 'youtube')
+                    .forEach((c) => YOUTUBE_IDS.add(c.id));
+            } catch (e) {
+                // If fetch fails, continue without YouTube-specific settings
+            }
+
+            const inferTitle = (text: string) => {
+                const firstSentence = text.split(/(?<=[.!?])\s+/)[0] || text;
+                return firstSentence.trim().slice(0, 100) || 'Video';
+            };
+
             const postData = {
                 type: status === 'scheduled' ? 'schedule' as const : 'now' as const,
                 date: status === 'scheduled' ? scheduledDate : new Date().toISOString(),
@@ -71,7 +87,14 @@ export const createPostTool: PostizToolDefinition<typeof schema> = {
                     })),
                     group: Date.now().toString(),
                     settings: {
-                        post_type: 'post'
+                        post_type: 'post',
+                        who_can_reply_post: 'everyone',
+                        ...(YOUTUBE_IDS.has(integrationId)
+                            ? {
+                                  title: inferTitle(content[0]),
+                                  type: 'public'
+                              }
+                            : {})
                     }
                 }))
             };
