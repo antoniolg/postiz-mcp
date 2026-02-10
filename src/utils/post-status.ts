@@ -22,5 +22,9 @@ export function resolvePostDate(type: PostizApiPostType, scheduledDate?: string)
         return new Date().toISOString();
     }
 
-    return undefined;
+    if (scheduledDate) {
+        return scheduledDate;
+    }
+
+    return new Date().toISOString();
 }

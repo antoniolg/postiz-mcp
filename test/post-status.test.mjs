@@ -19,8 +19,16 @@ test('maps now status to now type', () => {
     assert.equal(toPostizApiType('now'), 'now');
 });
 
-test('resolvePostDate returns undefined for drafts', () => {
-    assert.equal(resolvePostDate('draft'), undefined);
+test('resolvePostDate sets ISO date for drafts when omitted', () => {
+    const result = resolvePostDate('draft');
+
+    assert.ok(typeof result === 'string');
+    assert.ok(!Number.isNaN(new Date(result).getTime()));
+});
+
+test('resolvePostDate preserves explicit date for drafts', () => {
+    const draftDate = '2026-02-11T09:00:00+01:00';
+    assert.equal(resolvePostDate('draft', draftDate), draftDate);
 });
 
 test('resolvePostDate preserves scheduled date', () => {
