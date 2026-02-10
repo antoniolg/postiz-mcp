@@ -3,6 +3,7 @@ import { PostizApiClient } from '../postiz-api.js';
 import { z } from 'zod';
 import { PostizToolDefinition } from './tool-definition.js';
 import { convertMarkdownToHtml } from '../utils/markdown.js';
+import { resolvePostDate, toPostizApiType } from '../utils/post-status.js';
 
 const schema = {
     content: z.array(z.string()).describe('Array of text content for posts (one item = single post, multiple items = thread/multiple posts). IMPORTANT: If user wants to add comments to posts, each comment is a separate post in this array.'),
@@ -67,9 +68,12 @@ export const createPostTool: PostizToolDefinition<typeof schema> = {
                 return firstSentence.trim().slice(0, 100) || 'Video';
             };
 
+            const type = toPostizApiType(status);
+            const date = resolvePostDate(type, scheduledDate);
+
             const postData = {
-                type: status === 'scheduled' ? 'schedule' as const : 'now' as const,
-                date: status === 'scheduled' ? scheduledDate : new Date().toISOString(),
+                type,
+                ...(date ? { date } : {}),
                 shortLink: false,
                 tags: [],
                 posts: integrations.map((integrationId) => ({

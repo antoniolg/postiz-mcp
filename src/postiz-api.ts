@@ -1,5 +1,6 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import FormData from 'form-data';
+import { resolvePostDate, toPostizApiType } from './utils/post-status.js';
 
 export interface PostizChannel {
     id: string;
@@ -23,7 +24,7 @@ export interface PostizPost {
 }
 
 export interface CreatePostRequest {
-    type: 'schedule' | 'now';
+    type: 'draft' | 'schedule' | 'now';
     date?: string;
     shortLink: boolean;
     tags: string[];
@@ -175,9 +176,9 @@ export class PostizApiClient {
         }
 
         // Convert UpdatePostRequest to CreatePostRequest format
+        const type = toPostizApiType(postData.status);
         const createPostFormat: CreatePostRequest = {
-            type: postData.status === 'scheduled' ? 'schedule' : 
-                  postData.status === 'now' ? 'now' : 'schedule',
+            type,
             shortLink: false,
             tags: [],
             posts: postData.integrations.map(integrationId => ({
@@ -202,10 +203,9 @@ export class PostizApiClient {
         };
 
         // Set the date if provided
-        if (postData.scheduledDate) {
-            createPostFormat.date = postData.scheduledDate;
-        } else if (postData.status === 'now') {
-            createPostFormat.date = new Date().toISOString();
+        const date = resolvePostDate(type, postData.scheduledDate);
+        if (date) {
+            createPostFormat.date = date;
         }
 
         // Use the common method with the post ID
