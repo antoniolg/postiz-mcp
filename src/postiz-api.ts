@@ -1,6 +1,7 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import FormData from 'form-data';
 import { resolvePostDate, toPostizApiType } from './utils/post-status.js';
+import { toImagePayload } from './utils/image.js';
 
 export interface PostizChannel {
     id: string;
@@ -187,11 +188,8 @@ export class PostizApiClient {
                 },
                 value: [{
                     content: postData.content || '',
-                    image: postData.images && postData.images.length > 0 
-                        ? postData.images.map(img => ({
-                            id: img.includes('/') ? '' : img,
-                            path: img
-                        }))
+                    image: postData.images && postData.images.length > 0
+                        ? postData.images.map(toImagePayload)
                         : []
                 }],
                 group: 'post',
