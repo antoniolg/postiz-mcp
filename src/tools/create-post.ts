@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { PostizToolDefinition } from './tool-definition.js';
 import { convertMarkdownToHtml } from '../utils/markdown.js';
 import { resolvePostDate, toPostizApiType } from '../utils/post-status.js';
+import { toImagePayload } from '../utils/image.js';
 
 const schema = {
     content: z.array(z.string()).describe('Array of text content for posts (one item = single post, multiple items = thread/multiple posts). IMPORTANT: If user wants to add comments to posts, each comment is a separate post in this array.'),
@@ -83,10 +84,7 @@ export const createPostTool: PostizToolDefinition<typeof schema> = {
                     value: content.map((postContent, index) => ({
                         content: convertMarkdownToHtml(postContent),
                         image: index === 0 && images && images.length > 0
-                            ? images.map((img) => ({
-                                  id: img,
-                                  path: img
-                              }))
+                            ? images.map(toImagePayload)
                             : []
                     })),
                     group: Date.now().toString(),
