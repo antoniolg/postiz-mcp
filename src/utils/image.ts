@@ -8,7 +8,8 @@
  *   backend can look them up via `_mediaService.getMediaById`.
  */
 export function toImagePayload(img: string): { id: string; path: string } {
-    const isUrl = img.startsWith('http://') || img.startsWith('https://');
+    const lower = img.toLowerCase();
+    const isUrl = lower.startsWith('http://') || lower.startsWith('https://');
     return {
         id: isUrl ? '' : img,
         path: img

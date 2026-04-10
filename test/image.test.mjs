@@ -27,6 +27,12 @@ test('file ID with slashes is still treated as ID (not URL)', () => {
     assert.equal(result.path, 'uploads/2024/image.jpg');
 });
 
+test('URL with uppercase scheme is still recognised as URL', () => {
+    const result = toImagePayload('HTTPS://cdn.example.com/image.jpg');
+    assert.equal(result.id, '');
+    assert.equal(result.path, 'HTTPS://cdn.example.com/image.jpg');
+});
+
 test('empty string returns empty id and path', () => {
     const result = toImagePayload('');
     assert.equal(result.id, '');
