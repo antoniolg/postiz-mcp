@@ -1,3 +1,7 @@
+> [!WARNING]
+> **Archivado · Archived.** Este servidor MCP ya no se mantiene y sus dependencias no se actualizan: úsalo bajo tu responsabilidad. This MCP server is no longer maintained and its dependencies are not updated: use it at your own risk.
+> Lo que enseño ahora · What I teach now: [devexpert.io](https://devexpert.io)
+
 # Postiz MCP Server & CLI
 
 A Model Context Protocol (MCP) server **and** command-line interface for the [Postiz](https://postiz.com) social media scheduling API. Both entrypoints share the same tool definitions so that AI assistants and human operators can manage social media posts across multiple platforms with identical capabilities.
